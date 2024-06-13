@@ -1,47 +1,56 @@
-import os
-import tkinter as tk
-from tkinter import ttk, messagebox
-from questionsData import questions
+import csv
+import cv2
+from cvzone.HandTrackingModule import HandDetector
+import cvzone
 
 
+#Clase 
+class MCQ():
+    def __init__(self, data):
+        self.question = data[0]
+        self.choice1 = data[1]
+        self.choice2 = data[2]
+        self.choice3 = data[3]
+        self.choice4 = data[4]
+        self.anwer = int(data[5])
 
-def show_question():
-    question = questions[0]
-    question_label.config(text=question["question"])
-    for i, option in enumerate(question["options"]):
-        option_buttons[i].config(text=option, command=lambda: check_answer(option))
-    next_button.config(state="disabled")
+        self.userAns = None
 
-def check_answer(answer):
-    question = questions[0]
-    if answer == question["answer"]:
-        messagebox.showinfo("Correct", "You got it right!")
-    else:
-        messagebox.showerror("Incorrect", "You got it wrong!")
-        print("The correct answer is", question["answer"])
-        print("You selected", answer)
-    next_button.config(state="normal")
+#Inicializa la camara
+cap = cv2.VideoCapture(0)
+cap.set(3, 1288)
+cap.set(4, 720)
+detector = HandDetector(detectionCon=0.8)
 
-def next_question():
-    pass
-
-root = tk.Tk()
-root.title("Quiz Game")
-
-question_label = tk.Label(root, text="Question goes here")
-question_label.pack()
+#Importa las preguntas desde el archivo csv
+pathCSV = "questionsData.csv"
+with open(pathCSV, newline='\n') as f:
+    reader = csv.reader(f)
+    dataAll = list(reader)[1:]
 
 
+#Crea una lista de objetos de preguntas
+mcqList = []
+for q in dataAll:
+    obj = MCQ(q)
+    mcqList.append(obj)
 
-option_buttons = []
-for i in range(4):
-    button = tk.Button(root, text="Option " + str(i + 1))
-    button.pack()
-    option_buttons.append(button)
+print(len(mcqList))
 
-next_button = tk.Button(root, text="Next", command=next_question)
-next_button.pack()
+#Inicializa las variables de las preguntas
+qNo = 0
+qTotal = len(dataAll)
 
-show_question()
+#Inicializa el detector de manos
+while True:
+    success, img = cap.read()
+    img = cv2.flip(img, 1)
+    hand, img = detector.findHands(img, flipType=False)
 
-root.mainloop()
+    mcq = mcqList[0]
+
+    #Dibuja la pregunta
+    img, cvzone.putTextRect(img, mcq.question, [100, 100], 2, 2, offset=20, border=2)
+
+    cv2.imshow("Img", img)
+    cv2.waitKey(1)
