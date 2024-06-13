@@ -16,6 +16,14 @@ class MCQ():
 
         self.userAns = None
 
+    def update(self,cursor,bboxs):
+        for x, bbox in enumerate(bboxs):
+            x1,y1,x2,y2 = bbox
+            if x1<cursor[0]<x2 and y1<cursor[1]<y2:
+                self.userAns = x+1
+                cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0), cv2.FILLED) #Cambiar el color del rectangulo si esta seleccionado
+
+
 #Inicializa la camara
 cap = cv2.VideoCapture(0)
 cap.set(3, 1288)
@@ -45,12 +53,31 @@ qTotal = len(dataAll)
 while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
-    hand, img = detector.findHands(img, flipType=False)
+    hands, img = detector.findHands(img, flipType=False)
 
-    mcq = mcqList[0]
+    mcq = mcqList[1]
 
     #Dibuja la pregunta
-    img, cvzone.putTextRect(img, mcq.question, [100, 100], 2, 2, offset=20, border=2)
+    img, bbox =  cvzone.putTextRect(img, mcq.question, [100, 100], 2, 2, offset=50, border=5,)
+
+    #Dibuja las opciones
+    img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [100, 250], 2, 2, offset=50, border=5,)
+    img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [400, 250], 2, 2, offset=50, border=5,)
+    img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [100, 400], 2, 2, offset=50, border=5,)
+    img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [400, 400], 2, 2, offset=50, border=5,)
+
+    #Detecta si la mano esta en la pantalla
+    if hands:
+        lmList = hands[0]['lmList']
+        cursor = lmList[8]
+
+        length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 0, 255),scale=10)
+
+
+        #Detecta si el cursor esta en una opcion
+        if length < 60:
+            mcq.update(cursor, [bbox1, bbox2, bbox3, bbox4])
+
 
     cv2.imshow("Img", img)
     cv2.waitKey(1)
