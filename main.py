@@ -21,7 +21,7 @@ class MCQ():
             x1,y1,x2,y2 = bbox
             if x1<cursor[0]<x2 and y1<cursor[1]<y2:
                 self.userAns = x+1
-                cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0), cv2.FILLED) #Cambiar el color del rectangulo si esta seleccionado
+                cv2.rectangle(img, (x1,y1), (x2,y2), (255, 255, 255), cv2.FILLED) #Cambiar el color del rectangulo si esta seleccionado
 
 
 #Inicializa la camara
@@ -58,20 +58,52 @@ while True:
     mcq = mcqList[1]
 
     #Dibuja la pregunta
-    img, bbox =  cvzone.putTextRect(img, mcq.question, [100, 100], 2, 2, offset=50, border=5,)
+    img, bbox =  cvzone.putTextRect(img, mcq.question, (250, 100),  
+        scale=3, thickness=2, 
+        colorT=(255, 255, 255), colorR=(255, 1, 1), 
+        font=cv2.FONT_HERSHEY_PLAIN, 
+        offset=20,  
+        border=2, colorB=(255, 255, 255) 
+    )
+        
+    
 
     #Dibuja las opciones
-    img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [100, 250], 2, 2, offset=50, border=5,)
-    img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [400, 250], 2, 2, offset=50, border=5,)
-    img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [100, 400], 2, 2, offset=50, border=5,)
-    img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [400, 400], 2, 2, offset=50, border=5,)
+    img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [50, 250],
+        scale=2, thickness=2, 
+        colorT=(255, 255, 255), colorR=(255, 103, 103), 
+        font=cv2.FONT_HERSHEY_PLAIN, 
+        offset=20,  
+        border=2, colorB=(255, 255, 255)
+    )
+    img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [50, 370],
+        scale=2, thickness=2, 
+        colorT=(255, 255, 255), colorR=(255, 103, 103), 
+        font=cv2.FONT_HERSHEY_PLAIN, 
+        offset=20,  
+        border=2, colorB=(255, 255, 255)
+    )
+    img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [50, 490],
+       scale=2, thickness=2, 
+        colorT=(255, 255, 255), colorR=(255, 103, 103), 
+        font=cv2.FONT_HERSHEY_PLAIN, 
+        offset=20,  
+        border=2, colorB=(255, 255, 255)
+    )
+    img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [50, 610],
+        scale=2, thickness=2, 
+        colorT=(255, 255, 255), colorR=(255, 103, 103), 
+        font=cv2.FONT_HERSHEY_PLAIN, 
+        offset=20,  
+        border=2, colorB=(255, 255, 255)
+    )
 
     #Detecta si la mano esta en la pantalla
     if hands:
         lmList = hands[0]['lmList']
         cursor = lmList[8]
 
-        length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 0, 255),scale=10)
+        length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 1, 1),scale=10) #color: es el color que detecta la punta de los dedos
 
 
         #Detecta si el cursor esta en una opcion
