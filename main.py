@@ -2,6 +2,7 @@ import csv
 import cv2
 from cvzone.HandTrackingModule import HandDetector
 import cvzone
+import time
 
 
 #Clase 
@@ -43,7 +44,7 @@ for q in dataAll:
     obj = MCQ(q)
     mcqList.append(obj)
 
-print(len(mcqList))
+print("Total de objetos MCQ creados:", len(mcqList))
 
 #Inicializa las variables de las preguntas
 qNo = 0
@@ -55,60 +56,75 @@ while True:
     img = cv2.flip(img, 1)
     hands, img = detector.findHands(img, flipType=False)
 
-    mcq = mcqList[1]
+    if qNo < qTotal:
+        mcq = mcqList[qNo]
 
-    #Dibuja la pregunta
-    img, bbox =  cvzone.putTextRect(img, mcq.question, (250, 100),  
-        scale=3, thickness=2, 
-        colorT=(255, 255, 255), colorR=(255, 1, 1), 
-        font=cv2.FONT_HERSHEY_PLAIN, 
-        offset=20,  
-        border=2, colorB=(255, 255, 255) 
-    )
+        #Dibuja la pregunta
+        img, bbox =  cvzone.putTextRect(img, mcq.question, (250, 100),  
+            scale=3, thickness=2, 
+            colorT=(255, 255, 255), colorR=(255, 1, 1), 
+            font=cv2.FONT_HERSHEY_PLAIN, 
+            offset=20,  
+            border=2, colorB=(255, 255, 255) 
+        )
         
-    
-
-    #Dibuja las opciones
-    img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [50, 250],
+        #Dibuja las opciones
+        img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [50, 250],
+            scale=2, thickness=2, 
+            colorT=(255, 255, 255), colorR=(255, 103, 103), 
+            font=cv2.FONT_HERSHEY_PLAIN, 
+            offset=20,  
+            border=2, colorB=(255, 255, 255)
+        )
+        img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [50, 370],
+            scale=2, thickness=2, 
+            colorT=(255, 255, 255), colorR=(255, 103, 103), 
+            font=cv2.FONT_HERSHEY_PLAIN, 
+            offset=20,  
+            border=2, colorB=(255, 255, 255)
+        )
+        img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [50, 490],
         scale=2, thickness=2, 
-        colorT=(255, 255, 255), colorR=(255, 103, 103), 
-        font=cv2.FONT_HERSHEY_PLAIN, 
-        offset=20,  
-        border=2, colorB=(255, 255, 255)
-    )
-    img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [50, 370],
-        scale=2, thickness=2, 
-        colorT=(255, 255, 255), colorR=(255, 103, 103), 
-        font=cv2.FONT_HERSHEY_PLAIN, 
-        offset=20,  
-        border=2, colorB=(255, 255, 255)
-    )
-    img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [50, 490],
-       scale=2, thickness=2, 
-        colorT=(255, 255, 255), colorR=(255, 103, 103), 
-        font=cv2.FONT_HERSHEY_PLAIN, 
-        offset=20,  
-        border=2, colorB=(255, 255, 255)
-    )
-    img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [50, 610],
-        scale=2, thickness=2, 
-        colorT=(255, 255, 255), colorR=(255, 103, 103), 
-        font=cv2.FONT_HERSHEY_PLAIN, 
-        offset=20,  
-        border=2, colorB=(255, 255, 255)
-    )
+            colorT=(255, 255, 255), colorR=(255, 103, 103), 
+            font=cv2.FONT_HERSHEY_PLAIN, 
+            offset=20,  
+            border=2, colorB=(255, 255, 255)
+        )
+        img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [50, 610],
+            scale=2, thickness=2, 
+            colorT=(255, 255, 255), colorR=(255, 103, 103), 
+            font=cv2.FONT_HERSHEY_PLAIN, 
+            offset=20,  
+            border=2, colorB=(255, 255, 255)
+        )
 
-    #Detecta si la mano esta en la pantalla
-    if hands:
-        lmList = hands[0]['lmList']
-        cursor = lmList[8]
+        #Detecta si la mano esta en la pantalla
+        if hands:
+            lmList = hands[0]['lmList']
+            cursor = lmList[8]
 
-        length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 1, 1),scale=10) #color: es el color que detecta la punta de los dedos
+            length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 1, 1),scale=10) #color: es el color que detecta la punta de los dedos
 
-
-        #Detecta si el cursor esta en una opcion
-        if length < 60:
-            mcq.update(cursor, [bbox1, bbox2, bbox3, bbox4])
+            #Detecta si el cursor esta en una opcion
+            if length < 40:
+                mcq.update(cursor, [bbox1, bbox2, bbox3, bbox4])
+                print(mcq.userAns)
+                if mcq.userAns is not None:
+                    time.sleep(0.3)
+                    qNo += 1
+    else:
+        score = 0
+        for mcq in mcqList:
+            if mcq.userAns == mcq.anwer:
+                score += 1
+        score = round((score/qTotal)*100,2)
+        img, _ = cvzone.putTextRect(img, "Quiz Completed", [250, 300], 2, 2, offset=50, border=5) #Mensaje de finalizacion
+        img, _ = cvzone.putTextRect(img, f'Your Score is: {score}%', [700, 300], 2, 2, offset=50, border=5) #Mensaje de puntuacion
+    #Dibuja la barra de progreso
+    barValue = 150 + (1000 // qTotal) * qNo
+    cv2.rectangle(img, (150, 650), (barValue, 700), (0, 255, 0), cv2.FILLED)
+    cv2.rectangle(img, (150, 650), (1150, 700), (255, 0, 255), 5)
+    img, _ = cvzone.putTextRect(img, f'{round((qNo/qTotal)*100)}%', [1180, 685], 2, 2, offset=16)
 
 
     cv2.imshow("Img", img)
