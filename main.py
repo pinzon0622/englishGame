@@ -4,8 +4,6 @@ from cvzone.HandTrackingModule import HandDetector
 import cvzone
 import time
 import numpy as np
-import tkinter as tk
-from tkinter import filedialog
 
 
 # Clase para gestionar las preguntas y respuestas
@@ -29,14 +27,13 @@ class MCQ():
 # Función para mostrar el menú de bienvenida
 def show_welcome_menu():
     while True:
-        img = cv2.imread('fondo-english.png')  # Puedes usar una imagen de fondo si lo prefieres
+        img = cv2.imread('assets/fondo-english.png')
         if img is None:
-            img = 255 * np.ones(shape=[720, 1280, 3], dtype=np.uint8)  # Imagen en blanco si no hay fondo
+            img = 255 * np.ones(shape=[720, 1280, 3], dtype=np.uint8)  
         else:
-            # Redimensionar la imagen de fondo para que se ajuste a la resolución de la pantalla (1280x720)
             img = cv2.resize(img, (1280, 720))
 
-        # Añadir texto de bienvenida
+       
         img, _ = cvzone.putTextRect(img, "Welcome to camera english game!", [220, 170],
                                     scale=3, thickness=2, 
                                     colorT=(255, 255, 255), colorR=(255, 1, 1), 
@@ -53,28 +50,24 @@ def show_welcome_menu():
         cv2.imshow("Welcome Menu", img)
         key = cv2.waitKey(0)
         
-        if key:  # Si se presiona cualquier tecla, continuar
+        if key:  
             cv2.destroyWindow("Welcome Menu")
             break
 
 
-# Lista con los nombres reales de los archivos
-files = ["animalsData.csv", "colorsData.csv", "numbersData.csv", "questionsData.csv"]
 
-# Lista con los nombres personalizados que se mostrarán
 display_names = ["Animals Quiz", "Colors Quiz", "Numbers Quiz", "Texts Quiz"]
 
 # Función para mostrar el menú de selección de archivo
 def show_file_selection_menu():
-    files = ['animalsData.csv', 'colorsData.csv', 'numbersData.csv', 'questionsData.csv']
+    files = ['data/animalsData.csv', 'data/colorsData.csv', 'data/numbersData.csv', 'data/questionsData.csv']
     selected_file = None
 
     while True:
-        img = cv2.imread('fondo-english-file.png')  # Puedes usar una imagen de fondo si lo prefieres
+        img = cv2.imread('assets/fondo-english-file.png')  
         if img is None:
-            img = 255 * np.ones(shape=[720, 1280, 3], dtype=np.uint8)  # Imagen en blanco si no hay fondo
+            img = 255 * np.ones(shape=[720, 1280, 3], dtype=np.uint8)  
         else:
-            # Redimensionar la imagen de fondo para que se ajuste a la resolución de la pantalla (1280x720)
             img = cv2.resize(img, (1280, 720))
             img, _ = cvzone.putTextRect(img, "Select a option of game", [350, 100], scale=3, thickness=2, 
                                     colorT=(255, 255, 255), colorR=(255, 1, 1), 
@@ -86,7 +79,6 @@ def show_file_selection_menu():
                                 colorT=(255, 255, 255), colorR=(255, 103, 103), 
                                 font=cv2.FONT_HERSHEY_PLAIN, offset=20, border=2, colorB=(255, 255, 255))
         
-        # Mostrar imagen en pantalla
         cv2.imshow("File Selection", img)
 
         key = cv2.waitKey(0)
@@ -94,7 +86,7 @@ def show_file_selection_menu():
         if key >= ord('1') and key < ord('1') + len(files):
             selected_file = files[key - ord('1')]
             break
-        elif key == ord('q'):  # Si se presiona 'q', salir
+        elif key == ord('q'):  
             break
     
     cv2.destroyWindow("File Selection")
@@ -108,22 +100,22 @@ def show_final_message(score):
 
         # Selecciona la imagen de fondo según el puntaje
         if score <= 25:
-            img = cv2.imread('score-25.png') 
+            img = cv2.imread('assets/score-25.png') 
             mensaje = "Keep trying, you can do it!"
             colorT = (255, 255, 255) 
             colorR = (0, 0, 255)  
         elif score <= 50:
-            img = cv2.imread('score-50.png') 
+            img = cv2.imread('assets/score-50.png') 
             mensaje = "Good effort, keep it up!"
             colorT = (255, 255, 255)  
             colorR = (255, 255, 0)
         elif score <= 75:
-            img = cv2.imread('score-75.png')  
+            img = cv2.imread('assets/score-75.png')  
             mensaje = "Great job, you're almost there!"
             colorT = (255, 255, 255) 
             colorR = (0, 255, 255) 
         else:
-            img = cv2.imread('score-100.png')
+            img = cv2.imread('assets/score-100.png')
             mensaje = "Amazing, keep shining!"
             colorT = (255, 255, 255)
             colorR = (255, 1, 1) 
@@ -251,13 +243,13 @@ while True:
             lmList = hands[0]['lmList']
             cursor = lmList[8]
 
-            length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 1, 1),scale=10) #color: es el color que detecta la punta de los dedos
+            length, info, img = detector.findDistance(lmList[8][0:2], lmList[12][0:2], img, color=(255, 1, 1),scale=10) 
 
             #Detecta si el cursor esta en una opcion
             if length < 40:
                 time.sleep(0.3)
                 mcq.update(cursor, [bbox1, bbox2, bbox3, bbox4])
-                #print(mcq.userAns)
+               
                 
                 if mcq.userAns is not None:
                     time.sleep(0.3)
@@ -294,6 +286,3 @@ while True:
         break
 
 cv2.destroyAllWindows()
-
-
-
