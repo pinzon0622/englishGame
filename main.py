@@ -3,6 +3,9 @@ import cv2
 from cvzone.HandTrackingModule import HandDetector
 import cvzone
 import time
+import numpy as np
+import tkinter as tk
+from tkinter import filedialog
 
 
 #Clase 
@@ -18,12 +21,52 @@ class MCQ():
         self.userAns = None
 
     def update(self,cursor,bboxs):
+       
         for x, bbox in enumerate(bboxs):
             x1,y1,x2,y2 = bbox
             if x1<cursor[0]<x2 and y1<cursor[1]<y2:
                 self.userAns = x+1
                 cv2.rectangle(img, (x1,y1), (x2,y2), (0, 255, 0), cv2.FILLED) #Cambiar el color del rectangulo si esta seleccionado
 
+
+def show_welcome_menu():
+    img = cv2.imread('background.jpg')  # Puedes usar una imagen de fondo si lo prefieres
+    if img is None:
+        img = 255 * np.ones(shape=[720, 1280, 3], dtype=np.uint8)  # Imagen en blanco si no hay fondo
+
+    # Añadir texto de bienvenida
+    img, _ = cvzone.putTextRect(img, "Welcome to camera english game!", [100, 200],
+                                scale=3, thickness=2, 
+                                colorT=(255, 255, 255), colorR=(255, 1, 1), 
+                                font=cv2.FONT_HERSHEY_PLAIN, 
+                                offset=20,  
+                                border=2, colorB=(255, 255, 255))
+    img, _ = cvzone.putTextRect(img, "Press any key for select a csv file", [100, 400],
+                                scale=2, thickness=2, 
+                                colorT=(255, 255, 255), colorR=(255, 1, 1), 
+                                font=cv2.FONT_HERSHEY_PLAIN, 
+                                offset=20,  
+                                border=2, colorB=(255, 255, 255))
+
+    # Mostrar la imagen
+    cv2.imshow("Welcome menu", img)
+    cv2.waitKey(0)  # Espera a que el usuario presione una tecla
+    cv2.destroyWindow("Welcome menu")
+
+    # Usar tkinter para abrir un cuadro de diálogo de selección de archivos
+    root = tk.Tk()
+    root.withdraw()  # Ocultar la ventana principal de tkinter
+    archivo_csv = filedialog.askopenfilename(title="Selecciona el archivo CSV de preguntas",
+    filetypes=[("CSV files", "*.csv")])
+    return archivo_csv
+
+# Llamar al menú de bienvenida antes de iniciar el bucle principal
+archivo_csv = show_welcome_menu()
+if not archivo_csv:
+    print("No se seleccionó ningún archivo. Saliendo...")
+    exit()
+
+print(f"Archivo CSV seleccionado: {archivo_csv}")
 
 #Inicializa la camara
 cap = cv2.VideoCapture(0)
@@ -32,7 +75,8 @@ cap.set(4, 720)
 detector = HandDetector(detectionCon=0.8)
 
 #Importa las preguntas desde el archivo csv
-pathCSV = "questionsData.csv"
+# pathCSV = "questionsData.csv"
+pathCSV = archivo_csv
 with open(pathCSV, newline='\n') as f:
     reader = csv.reader(f)
     dataAll = list(reader)[1:]
@@ -44,7 +88,6 @@ for q in dataAll:
     obj = MCQ(q)
     mcqList.append(obj)
 
-print("Total de objetos MCQ creados:", len(mcqList))
 
 #Inicializa las variables de las preguntas
 qNo = 0
@@ -58,6 +101,7 @@ while True:
 
     if qNo < qTotal:
         mcq = mcqList[qNo]
+        
 
         #Dibuja la pregunta
         img, bbox =  cvzone.putTextRect(img, mcq.question, (250, 100),  
@@ -107,8 +151,10 @@ while True:
 
             #Detecta si el cursor esta en una opcion
             if length < 40:
+                time.sleep(0.3)
                 mcq.update(cursor, [bbox1, bbox2, bbox3, bbox4])
-                print(mcq.userAns)
+                #print(mcq.userAns)
+                
                 if mcq.userAns is not None:
                     time.sleep(0.3)
                     qNo += 1
@@ -130,6 +176,12 @@ while True:
                                     font=cv2.FONT_HERSHEY_PLAIN, 
                                     offset=20,  
                                     border=2, colorB=(255, 255, 255) ) #Mensaje de puntuacion
+        img, _ = cvzone.putTextRect(img, "Presiona 'q' para salir", [100, 400],
+                                    scale=2, thickness=2, 
+                                    colorT=(255, 255, 255), colorR=(255, 1, 1), 
+                                    font=cv2.FONT_HERSHEY_PLAIN, 
+                                    offset=20,  
+                                    border=2, colorB=(255, 255, 255)) #Mensaje de salida
     #Dibuja la barra de progreso
     barValue = 80 + (1000 // qTotal) * qNo
     cv2.rectangle(img, (80, 620), (barValue, 680), (0, 255, 0), cv2.FILLED)
@@ -141,4 +193,12 @@ while True:
 
 
     cv2.imshow("Img", img)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+
+cv2.destroyAllWindows()
+
+
+
