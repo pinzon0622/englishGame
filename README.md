@@ -23,8 +23,8 @@ Este proyecto es una aplicación interactiva para niños diseñada para ayudarle
 
 1. **Clona este repositorio**:
     ```bash
-    git clone https://github.com/tu-usuario/english-learning-game.git
-    cd english-learning-game
+    git clone https://github.com/pinzon0622/englishGame.git
+    cd englishGame
     ```
 
 2. **Instala las dependencias**:
@@ -52,7 +52,7 @@ Este proyecto es una aplicación interactiva para niños diseñada para ayudarle
     - Números
     - Preguntas gramaticales
 
-4. **Responder preguntas**: Utiliza los gestos de tu mano para seleccionar la respuesta correcta. El cursor seguirá tu dedo índice y detectará cuando hagas una selección.
+4. **Responder preguntas**: Utiliza los gestos de tu mano para seleccionar la respuesta correcta. El cursor seguirá tu dedo índice y medio detectará cuando hagas una selección juntando los dedos.
 
 5. **Resultados**: Al finalizar el cuestionario, se mostrará una pantalla con tu puntaje y un mensaje motivador según el resultado obtenido.
 
