@@ -30,18 +30,21 @@ class MCQ():
 
 
 def show_welcome_menu():
-    img = cv2.imread('background.jpg')  # Puedes usar una imagen de fondo si lo prefieres
+    img = cv2.imread('fondo-english.png')  # Puedes usar una imagen de fondo si lo prefieres
     if img is None:
         img = 255 * np.ones(shape=[720, 1280, 3], dtype=np.uint8)  # Imagen en blanco si no hay fondo
+    else:
+        # Redimensionar la imagen de fondo para que se ajuste a la resolución de la pantalla (1280x720)
+        img = cv2.resize(img, (1280, 720))
 
     # Añadir texto de bienvenida
-    img, _ = cvzone.putTextRect(img, "Welcome to camera english game!", [100, 200],
+    img, _ = cvzone.putTextRect(img, "Welcome to camera english game!", [220, 300],
                                 scale=3, thickness=2, 
                                 colorT=(255, 255, 255), colorR=(255, 1, 1), 
                                 font=cv2.FONT_HERSHEY_PLAIN, 
                                 offset=20,  
                                 border=2, colorB=(255, 255, 255))
-    img, _ = cvzone.putTextRect(img, "Press any key for select a csv file", [100, 400],
+    img, _ = cvzone.putTextRect(img, "Press any key for select a csv file", [330, 400],
                                 scale=2, thickness=2, 
                                 colorT=(255, 255, 255), colorR=(255, 1, 1), 
                                 font=cv2.FONT_HERSHEY_PLAIN, 
@@ -104,7 +107,7 @@ while True:
         
 
         #Dibuja la pregunta
-        img, bbox =  cvzone.putTextRect(img, mcq.question, (250, 100),  
+        img, bbox =  cvzone.putTextRect(img, mcq.question, (150, 100),  
             scale=3, thickness=2, 
             colorT=(255, 255, 255), colorR=(255, 1, 1), 
             font=cv2.FONT_HERSHEY_PLAIN, 
@@ -113,28 +116,28 @@ while True:
         )
         
         #Dibuja las opciones
-        img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [50, 200],
+        img, bbox1 = cvzone.putTextRect(img, mcq.choice1, [50, 280],
             scale=2, thickness=2, 
             colorT=(255, 255, 255), colorR=(255, 103, 103), 
             font=cv2.FONT_HERSHEY_PLAIN, 
             offset=20,  
             border=2, colorB=(255, 255, 255)
         )
-        img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [50, 320],
+        img, bbox2 = cvzone.putTextRect(img, mcq.choice2, [50, 440],
             scale=2, thickness=2, 
             colorT=(255, 255, 255), colorR=(255, 103, 103), 
             font=cv2.FONT_HERSHEY_PLAIN, 
             offset=20,  
             border=2, colorB=(255, 255, 255)
         )
-        img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [50, 440],
+        img, bbox3 = cvzone.putTextRect(img, mcq.choice3, [400, 280],
         scale=2, thickness=2, 
             colorT=(255, 255, 255), colorR=(255, 103, 103), 
             font=cv2.FONT_HERSHEY_PLAIN, 
             offset=20,  
             border=2, colorB=(255, 255, 255)
         )
-        img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [50, 560],
+        img, bbox4 = cvzone.putTextRect(img, mcq.choice4, [400, 440],
             scale=2, thickness=2, 
             colorT=(255, 255, 255), colorR=(255, 103, 103), 
             font=cv2.FONT_HERSHEY_PLAIN, 
@@ -164,19 +167,19 @@ while True:
             if mcq.userAns == mcq.anwer:
                 score += 1
         score = round((score/qTotal)*100,2)
-        img, _ = cvzone.putTextRect(img, "Quiz Completed", [100, 300],
+        img, _ = cvzone.putTextRect(img, "Quiz Completed", [100, 100],
                                     scale=3, thickness=2, 
                                     colorT=(255, 255, 255), colorR=(255, 1, 1), 
                                     font=cv2.FONT_HERSHEY_PLAIN, 
                                     offset=20,  
                                     border=2, colorB=(255, 255, 255) ) #Mensaje de finalizacion
-        img, _ = cvzone.putTextRect(img, f'Your Score is: {score}%', [600, 300],
+        img, _ = cvzone.putTextRect(img, f'Your Score is: {score}%', [350, 530],
                                     scale=3, thickness=2, 
                                     colorT=(255, 255, 255), colorR=(255, 1, 1), 
                                     font=cv2.FONT_HERSHEY_PLAIN, 
                                     offset=20,  
                                     border=2, colorB=(255, 255, 255) ) #Mensaje de puntuacion
-        img, _ = cvzone.putTextRect(img, "Presiona 'q' para salir", [100, 400],
+        img, _ = cvzone.putTextRect(img, "Presiona 'q' para salir", [100, 200],
                                     scale=2, thickness=2, 
                                     colorT=(255, 255, 255), colorR=(255, 1, 1), 
                                     font=cv2.FONT_HERSHEY_PLAIN, 
@@ -184,9 +187,9 @@ while True:
                                     border=2, colorB=(255, 255, 255)) #Mensaje de salida
     #Dibuja la barra de progreso
     barValue = 80 + (1000 // qTotal) * qNo
-    cv2.rectangle(img, (80, 620), (barValue, 680), (0, 255, 0), cv2.FILLED)
-    cv2.rectangle(img, (80, 620), (1080, 680), (255, 255, 255), 5)
-    img, _ = cvzone.putTextRect(img, f'{round((qNo/qTotal)*100)}%', [1110, 665], 
+    cv2.rectangle(img, (80, 580), (barValue, 640), (0, 255, 0), cv2.FILLED)
+    cv2.rectangle(img, (80, 580), (1080, 640), (255, 255, 255), 5)
+    img, _ = cvzone.putTextRect(img, f'{round((qNo/qTotal)*100)}%', [1110, 625], 
                                 colorT=(255, 255, 255), colorR=(255, 1, 1), 
                                 offset=20,  
                                 border=2, colorB=(255, 255, 255))
